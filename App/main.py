@@ -61,18 +61,18 @@ def expired_token_callback(jwt_header, jwt_payload):
   return redirect(url_for('login'))
 
 
-# def parse_students():
-#   with open('students.csv', mode='r', encoding='utf-8') as file:
-#     csv_reader = csv.DictReader(file)
-#     for row in csv_reader:
-#       student = Student(id=row['ID'],
-#                         first_name=row['FirstName'],
-#                         image=row['Picture'],
-#                         last_name=row['LastName'],
-#                         programme=row['Programme'],
-#                         start_year=row['YearStarted'])
-#       db.session.add(student)
-#     db.session.commit()
+def parse_students():
+  with open('students.csv', mode='r', encoding='utf-8') as file:
+    csv_reader = csv.DictReader(file)
+    for row in csv_reader:
+      student = Student(id=row['ID'],
+                        first_name=row['FirstName'],
+                        image=row['Picture'],
+                        last_name=row['LastName'],
+                        programme=row['Programme'],
+                        start_year=row['YearStarted'])
+      db.session.add(student)
+    db.session.commit()
 
 def create_users():
   rob = User(username="rob", password="robpass")
@@ -84,15 +84,16 @@ def create_users():
   db.session.commit()
 
 
-# def create_courses():
-#   info1601 = Course(code="INFO1601", name="Intro To WWW Programming")
-#   info2602 = Course(code="INFO2602", name="Web Programming & Technologies 1")
-#   info1600 = Course(code="INFO1600", name="IT Concepts")
-#   comp2605 = Course(code="COMP2605", name="Database Management Systems")
-#   db.session.add_all([info1601, info2602, info1600, comp2605])
-#   db.session.commit()
+def create_courses():
+  info1601 = Course(code="INFO1601", name="Intro To WWW Programming")
+  info2602 = Course(code="INFO2602", name="Web Programming & Technologies 1")
+  info1600 = Course(code="INFO1600", name="IT Concepts")
+  comp2605 = Course(code="COMP2605", name="Database Management Systems")
+  db.session.add_all([info1601, info2602, info1600, comp2605])
+  db.session.commit()
 
 
+# uncomment after models are implemented
 def initialize_db():
   db.drop_all()
   db.create_all()
