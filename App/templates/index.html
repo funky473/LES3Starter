@@ -36,6 +36,9 @@
           
           <ul>
             <!-- course navigation here -->
+             {% for course in courses %}
+              <li><a href="/app/{{ course.code}}">{{ course.code }}</a></li>
+              {% endfor %}
           </ul>
         </div>
       </nav>
@@ -68,22 +71,61 @@
       <div class="col s12 m3 l4">
         <!-- show course name here -->
         <h1>Class List for </h1> 
+        {% for course in courses %}
+        {%if code == course.code %}
+        <h1>{{ course.code }}</h1>
+        {% endif %}
+        {% endfor %}
+  
       </div>
     </div>
 
     <div class="row">
-
-      <section class="col s12 m9 l8" style="overflow-y:scroll; height: 70vh">
-        
-        <!-- show students currently not in course here -->
-        
-      </section>
+    <section class="col s12 m9 l8" style="overflow-y:scroll; height: 70vh; display: flex; flex-wrap: wrap; gap: 10px;">
+      
+      <!-- show students currently not in course here -->
+       {% for available_student in available_students %}
+        <div class="col s12 m6 l4">
+      <div class="card horizontal">
+        <div class="card-image">
+          <img src="{{available_student.image}}">
+        </div>
+        <div class="card-stacked">
+          <div class="card-content">
+        <p><b>{{available_student.first_name}} {{available_student.last_name}}</b></p>
+        <p>{{available_student.programme}}</p>
+          </div>
+          <div class="card-action">
+            <form action="/add/{{ available_student.id }}" method="POST">
+              <input type="hidden" name="course_code" value="{{ course.code }}">
+              <input type="hidden" name="student_id" value="{{ available_student.id }}">
+              <button type="submit" class="btn waves-effect waves-light">Regesiter</button>
+            </form>
+          </div>
+        </div>
+      </div>
+        </div>
+      {% endfor %}
+      
+    </section>
 
       <section class="col s12 m3 l4" style="overflow-y:scroll; height: 70vh">
 
         <ul class="collection">
 
           <!-- show students currently in course here -->
+          {% for student in enrolled%}
+            <li class="collection-item">
+              <div>
+                {{ student.first_name }} {{ student.last_name }}
+                <span class="secondary-content">
+                  <form action="/remove/{{student.id }}" method="POST">
+                    <input type="hidden" name="course_code" value="{{ course.code }}">
+                    <button type="submit" class="btn-floating btn-small waves-effect waves-light red"><i class="material-icons">delete</i></button>
+                  </form>
+              </div>
+            </li>
+          {% endfor %}
           
         </ul>
 

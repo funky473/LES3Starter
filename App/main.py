@@ -89,15 +89,20 @@ def create_courses():
   comp2605 = Course(code="COMP2605", name="Database Management Systems")
   db.session.add_all([info1601, info2602, info1600, comp2605])
   db.session.commit()
-
+def create_student_course():
+  frist = StudentCourse(student_id="816035936", course_code="INFO1601")
+  second = StudentCourse(student_id="816044364", course_code="INFO2602")
+  db.session.add_all([frist , second])
+  db.session.commit()
 
 # uncomment after models are implemented
 def initialize_db():
   db.drop_all()
   db.create_all()
   create_users()
-  # create_courses()
-  # parse_students()
+  create_courses()
+  parse_students()
+  create_student_course()
   print('database intialized')
 
 
@@ -125,7 +130,35 @@ def login_action():
 @app.route('/app/<code>')
 @jwt_required()
 def home(code="INFO1601"):
-  return render_template('index.html', user=current_user)
+  # check if user is authenticated
+  courses = Course.query.all()
+  students = Student.query.all()
+  enrolled_students = StudentCourse.query.filter_by(course_code=code).all()
+  students_ids = [student.student_id for student in enrolled_students]
+  enrolled = Student.query.filter(Student.id.in_(students_ids)).all()
+  available_students = Student.query.filter(~Student.id.in_(students_ids)).all()
+  course = Course.query.filter_by(code=code).first()
+  return render_template('index.html', user=current_user, courses=courses, code=code, students=students,enrolled=enrolled,course=course, available_students=available_students)
+
+@app.route('/add/<student>', methods=['POST'])
+@jwt_required()
+def add_student(student):
+  student_id = request.form.get('student_id')
+  course_code = request.form.get('course_code')
+  student_course = StudentCourse(student_id=student_id, course_code=course_code)
+  db.session.add(student_course)
+  db.session.commit()
+  return redirect(url_for('home', code=course_code))
+
+@app.route('/remove/<student>', methods=['POST'])
+@jwt_required()
+def remove_student(student):
+  course_code = request.form.get('course_code')
+  student_course = StudentCourse.query.filter_by(student_id=student, course_code=course_code).first()
+  db.session.delete(student_course)
+  db.session.commit()
+  return redirect(url_for('home', code=course_code))
+
 
 @app.route('/logout')
 def logout():
